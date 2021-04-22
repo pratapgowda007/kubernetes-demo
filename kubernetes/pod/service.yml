@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pratap-demo-service
+  labels:
+    app: pratap-demo-service
+spec:
+  type: NodePort
+  #type: ClusterIP/NodePort/LoadBalancer/ExternalName
+  #externalName: api.ge.com #this is only for external name type
+  selector:
+    app: pratap-demo-match
+  ports:
+    - port: 8080
+      targetPort: 8080
+      #nodePort: 31000

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pratap-demo-deployment-name #pod name will start with this name
+  labels:
+    app: pratap-demo-deployment-label
+spec:
+  replicas: 2
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: pratap-demo-match # match this with all the containers having same label
+  template:
+    metadata:
+      labels:
+        app: pratap-demo-match #pod label, required by service
+    spec:
+      containers:
+        - name: pratap-demo-pod-name #this is not pod name
+          image: hc-eu-west-aws-artifactory.cloud.health.ge.com/docker-perinatal-all/pratap-file-upload-test:1.0.2
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: "/temp/pratap/test"
+              name: pratap-persistent-volume
+            - mountPath: "/temp/pratap/config"
+              name: file-config-volume
+              readOnly: true
+            - mountPath: "/temp/pratap/secrets"
+              name: secrets-volume
+              readOnly: true
+          resources:
+            limits:
+              memory: "512Mi" #128MB
+              cpu: "200m" #200 milli cpu (0.2 cpu or 20% of the cpu)
+          env:
+            - name: FILE_NAME # this will become environment name
+              valueFrom:
+                configMapKeyRef:
+                  key: file_name # key inside config map data
+                  name: pratap-demo-config-map # name of the config map
+            - name: USER_NAME
+              value: Pratap A K # direct value passing from here
+            - name: USER_FILE_NAME
+              value: $(USER_NAME)-$(FILE_NAME) # placeholder which gets value from above items
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pratap-demo-secret
+          envFrom: # load all at once
+            - configMapRef:
+                name: pratap-demo-config-map
+      volumes:
+        - name: pratap-persistent-volume
+          persistentVolumeClaim:
+            claimName: pratap-persistent-volume-claim
+        - name: file-config-volume
+          configMap:
+            name: pratap-demo-config-map # one file will be created for each key in config map
+        - name: secrets # accessing secrets as volume
+          secret:
+            secretName: pratap-demo-secret
+            defaultMode: 256 # Secret files permissions (0644 is used by default)
+            items: # Projection of Secret keys to specific paths
+              - key: username
+                path: my-group/my-username # user name secret is stored under /temp/pratap/secrets/my-group/my-username
+                mode: 511 # different mode for different file

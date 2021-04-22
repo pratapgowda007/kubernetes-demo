@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: pratap-demo-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: pratap-demo.com
+      http:
+        paths:
+          - backend:
+              serviceName: pratap-demo-service
+              servicePort: 8080

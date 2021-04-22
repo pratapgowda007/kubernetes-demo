@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pratap-demo-config-map
+data:
+  file_name : demo.txt
+  file_content: "file-content.properties"
+  #
+  # file-like keys
+  file-content.properties: /
+    user.name=Pratap
+    user.email=pratap@ge.com

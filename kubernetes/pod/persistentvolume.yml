@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pratap-persistent-volume
+#  finalizers:
+#    - kubernetes.io/pv-protection #won't allow to delete
+spec:
+  capacity:
+    storage: 2Gi
+  nfs:
+    server: 10.84.113.118 #cinder/nfs/azure/gce/aws -- we can use any provider
+    path: /nfs
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Delete #retain/recycle
+  storageClassName: pratap-storage-class
+  volumeMode: Filesystem #Block

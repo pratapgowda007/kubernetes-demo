@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pratap-demo
+spec:
+  containers:
+    - name: pratap-demo
+      image: hc-eu-west-aws-artifactory.cloud.health.ge.com/docker-perinatal-all/pratap-file-upload-test:1.0.0
+      ports:
+        - containerPort: 8080
+      livenessProbe: # when should a container restart
+        httpGet:
+          port: 8080
+          path: /index.html
+        initialDelaySeconds: 10
+        timeoutSeconds: 2
+        periodSeconds: 5
+        failureThreshold: 1
+      readinessProbe: # when should a container should start receiving traffic
+        httpGet:
+          port: 8080
+          path: /index.html
+        initialDelaySeconds: 10
+        periodSeconds: 5
